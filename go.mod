@@ -1,9 +1,9 @@
-module github.com/gogs/git-module
+module github.com/CowellTech/git-module-1.1.2
 
-go 1.12
+go 1.16
 
 require (
-	github.com/mcuadros/go-version v0.0.0-20190308113854-92cdf37c5b75
-	github.com/stretchr/testify v1.4.0
-	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
+	github.com/mcuadros/go-version v0.0.0-20190830083331-035f6764e8d2
+	github.com/stretchr/testify v1.7.0
+	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 )
