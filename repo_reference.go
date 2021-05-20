@@ -254,7 +254,7 @@ type CreateBranchOptions struct {
 	Timeout time.Duration
 }
 
-func RepoCreateBranch(repoPath, name string, opts ...CreateBranchOptions) error {
+func RepoCreateBranch(repoPath, name string, base string, opts ...CreateBranchOptions) error {
 	var opt CreateBranchOptions
 	if len(opts) > 0 {
 		opt = opts[0]
@@ -262,10 +262,10 @@ func RepoCreateBranch(repoPath, name string, opts ...CreateBranchOptions) error 
 
 	cmd := NewCommand("update-ref")
 
-	_, err := cmd.AddArgs(RefsHeads+name).RunInDirWithTimeout(opt.Timeout, repoPath)
+	_, err := cmd.AddArgs(RefsHeads+name).AddArgs(base).RunInDirWithTimeout(opt.Timeout, repoPath)
 	return err
 }
 
-func (r *Repository) CreateBranch(name string, opts ...CreateBranchOptions) error {
-	return nil
+func (r *Repository) CreateBranch(name string, base string, opts ...CreateBranchOptions) error {
+	return RepoCreateBranch(r.path, name, base, opts...)
 }
