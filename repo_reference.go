@@ -6,6 +6,7 @@ package git
 
 import (
 	"errors"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -268,4 +269,67 @@ func RepoCreateBranch(repoPath, name string, base string, opts ...CreateBranchOp
 
 func (r *Repository) CreateBranch(name string, base string, opts ...CreateBranchOptions) error {
 	return RepoCreateBranch(r.path, name, base, opts...)
+}
+
+type DiffBranchInfo struct {
+	ChangeInfo      string
+	Branch1CommitId string
+	Branch2CommitId string
+	FileList        []DiffBranchChangeList
+	Error           string
+}
+
+type DiffBranchChangeList struct {
+	File     string
+	IsBinary bool
+}
+
+func (repo *Repository) DiffBranch(branch1 string, branch2 string) (diffBranchRes DiffBranchInfo, err error) {
+	data, err := NewCommand("diff", branch1, branch2, "--stat").RunInDirBytes(repo.Path())
+	if err != nil {
+		if strings.Contains(err.Error(), "exit status 128") {
+			diffBranchRes.Error = "exit status 128, Repository not exists or branch not exists"
+			return diffBranchRes, err
+		}
+		return diffBranchRes, err
+	}
+	branch1Ref, err := NewCommand("show-ref", branch1).RunInDirBytes(repo.Path())
+	if err != nil {
+		diffBranchRes.Branch1CommitId = branch1
+	}
+	branch1CommitId := strings.Split(string(branch1Ref), " ")[0]
+	diffBranchRes.Branch1CommitId = branch1CommitId
+	branch2Ref, err := NewCommand("show-ref", branch2).RunInDirBytes(repo.Path())
+	if err != nil {
+		diffBranchRes.Branch2CommitId = branch2
+	}
+	branch2CommitId := strings.Split(string(branch2Ref), " ")[0]
+	diffBranchRes.Branch2CommitId = branch2CommitId
+
+	fileLines := strings.Split(string(data), "\n")
+	isEndReg, _ := regexp.Compile(`\|`)
+	isBinaryReg, _ := regexp.Compile(`\| Bin`)
+	var fileList []DiffBranchChangeList
+
+	for _, v := range fileLines {
+		if isEnd := isEndReg.FindString(v); len(isEnd) == 0 && len(v) > 0 {
+			diffBranchRes.ChangeInfo = strings.Trim(v, " ")
+			break
+		}
+
+		file := strings.Split(v, "|")[0]
+		file = strings.Trim(file, " ")
+
+		var isBinary bool
+		if isBinaryStr := isBinaryReg.FindString(v); len(isBinaryStr) > 0 && len(v) > 0 {
+			isBinary = true
+		}
+
+		fileList = append(fileList, DiffBranchChangeList{
+			File:     file,
+			IsBinary: isBinary,
+		})
+	}
+	diffBranchRes.FileList = fileList
+	return diffBranchRes, nil
 }

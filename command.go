@@ -186,3 +186,9 @@ func (c *Command) RunWithTimeout(timeout time.Duration) ([]byte, error) {
 func (c *Command) Run() ([]byte, error) {
 	return c.RunWithTimeout(DefaultTimeout)
 }
+
+// RunInDir executes the command in given directory
+// and returns stdout in []byte and error (combined with stderr).
+func (c *Command) RunInDirBytes(dir string) ([]byte, error) {
+	return c.RunInDirWithTimeout(-1, dir)
+}
