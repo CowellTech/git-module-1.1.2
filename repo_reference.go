@@ -272,8 +272,10 @@ func (r *Repository) CreateBranch(name string, base string, opts ...CreateBranch
 }
 
 type DiffBranchInfo struct {
-	Branch1 string
-	Branch2 string
+	Repo            string
+	Owner           string
+	Branch1         string
+	Branch2         string
 	ChangeInfo      string
 	Branch1CommitId string
 	Branch2CommitId string

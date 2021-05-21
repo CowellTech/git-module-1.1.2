@@ -1,0 +1,11 @@
+{
+    "projectManager.git.baseFolders": [
+        "/home/gbren/Projects/"
+    ],
+    "remote.extensionKind": {
+    
+        "pub.name": [
+            "ui"
+        ]
+    }
+}
