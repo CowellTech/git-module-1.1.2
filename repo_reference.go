@@ -289,7 +289,7 @@ type DiffBranchChangeList struct {
 }
 
 func (repo *Repository) DiffBranch(branch1 string, branch2 string) (diffBranchRes DiffBranchInfo, err error) {
-	data, err := NewCommand("diff", branch1, branch2, "--stat").RunInDirBytes(repo.Path())
+	data, err := NewCommand("diff", branch1, branch2, "--stat-width=99999").RunInDirBytes(repo.Path())
 	if err != nil {
 		if strings.Contains(err.Error(), "exit status 128") {
 			diffBranchRes.Error = "exit status 128, Repository not exists or branch not exists"
