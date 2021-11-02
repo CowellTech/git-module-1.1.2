@@ -297,13 +297,13 @@ func (repo *Repository) DiffBranch(branch1 string, branch2 string) (diffBranchRe
 		}
 		return diffBranchRes, err
 	}
-	branch1Ref, err := NewCommand("show-ref", branch1).RunInDirBytes(repo.Path())
+	branch1Ref, err := NewCommand("show-ref", "--heads", branch1).RunInDirBytes(repo.Path())
 	if err != nil {
 		diffBranchRes.Branch1CommitId = branch1
 	}
 	branch1CommitId := strings.Split(string(branch1Ref), " ")[0]
 	diffBranchRes.Branch1CommitId = branch1CommitId
-	branch2Ref, err := NewCommand("show-ref", branch2).RunInDirBytes(repo.Path())
+	branch2Ref, err := NewCommand("show-ref", "--heads", branch2).RunInDirBytes(repo.Path())
 	if err != nil {
 		diffBranchRes.Branch2CommitId = branch2
 	}
