@@ -136,7 +136,6 @@ func (r *Repository) DiffBinary(base, head string, opts ...DiffBinaryOptions) ([
 }
 
 type DiffBinaryInfo struct {
-	Base         string `json:"base"`
 	Head         string `json:"head"`
 	BaseCommit   string `json:"baseCommit"`
 	HeadCommit   string `json:"headCommit"`
@@ -151,14 +150,7 @@ func (r *Repository) DiffBinaryInfo(base, head string, opts ...DiffBinaryOptions
 
 	diffResult := &DiffBinaryInfo{}
 
-	diffResult.Base = base
-	diffResult.Head = head
-	baseRef, err := NewCommand("show-ref", "--heads", base).RunInDirWithTimeout(opt.Timeout, r.path)
-	if err != nil {
-		diffResult.BaseCommit = base
-	}
-	baseCommit := strings.Split(string(baseRef), " ")[0]
-	diffResult.BaseCommit = baseCommit
+	diffResult.BaseCommit = base
 	headRef, err := NewCommand("show-ref", "--heads", head).RunInDirWithTimeout(opt.Timeout, r.path)
 	if err != nil {
 		diffResult.HeadCommit = head
