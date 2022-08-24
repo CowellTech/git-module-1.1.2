@@ -143,32 +143,34 @@ type DiffBinaryInfo struct {
 	PatchContent []byte `json:"patchContent"`
 }
 
-func (r *Repository) DiffBinaryInfo(base, head string, opts ...DiffBinaryOptions) (res *DiffBinaryInfo, err error) {
+func (r *Repository) DiffBinaryInfo(base, head string, opts ...DiffBinaryOptions) (*DiffBinaryInfo, error) {
 	var opt DiffBinaryOptions
 	if len(opts) > 0 {
 		opt = opts[0]
 	}
 
-	res.Base = base
-	res.Head = head
+	diffResult := &DiffBinaryInfo{}
+
+	diffResult.Base = base
+	diffResult.Head = head
 	baseRef, err := NewCommand("show-ref", "--heads", base).RunInDirWithTimeout(opt.Timeout, r.path)
 	if err != nil {
-		res.BaseCommit = base
+		diffResult.BaseCommit = base
 	}
 	baseCommit := strings.Split(string(baseRef), " ")[0]
-	res.BaseCommit = baseCommit
+	diffResult.BaseCommit = baseCommit
 	headRef, err := NewCommand("show-ref", "--heads", head).RunInDirWithTimeout(opt.Timeout, r.path)
 	if err != nil {
-		res.HeadCommit = head
+		diffResult.HeadCommit = head
 	}
 	headCommit := strings.Split(string(headRef), " ")[0]
-	res.HeadCommit = headCommit
+	diffResult.HeadCommit = headCommit
 
 	patch, err := NewCommand("diff", "--binary", base, head).RunInDirWithTimeout(opt.Timeout, r.path)
 	if err != nil {
 		return nil, err
 	}
 
-	res.PatchContent = patch
-	return
+	diffResult.PatchContent = patch
+	return diffResult, nil
 }
